@@ -1,6 +1,5 @@
 package com.edamam.demo;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okhttp3.*;
@@ -8,6 +7,9 @@ import okhttp3.*;
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * Sample code for accessing Edamam's Nutrition Analysis API.
+ */
 public class EdamamApiDemo {
     private static final MediaType APPLICATION_JSON = MediaType.parse("application/json");
     private static final String RECIPE = "{\n" +
@@ -40,21 +42,26 @@ public class EdamamApiDemo {
         final String appId = args[0];
         final String appKey = args[1];
 
+        // Prepare the URL
         final HttpUrl url = HttpUrl.parse("https://api.edamam.com/api/nutrition-details")
                                    .newBuilder()
                                    .addQueryParameter("app_id", appId)
                                    .addQueryParameter("app_key", appKey)
                                    .build();
 
+        // And the request.
         final Request request = new Request.Builder()
                 .url(url)
-                .post(RequestBody.create(APPLICATION_JSON, RECIPE))
+                .post(RequestBody.create(APPLICATION_JSON, RECIPE)) // this will add the Content-Type header as well
                 .build();
 
         final OkHttpClient httpClient = new OkHttpClient.Builder()
                 .build();
 
+        // Make the request
         final Response response = httpClient.newCall(request).execute();
+
+        // Handle error responses
         if (!response.isSuccessful()) {
             System.err.printf("Encountered a problem: %d - %s%n", response.code(), response.message());
             System.exit(2);
@@ -63,13 +70,15 @@ public class EdamamApiDemo {
         try (ResponseBody body = response.body();
              Reader reader = body.charStream()) {
 
-            final JsonElement jsonElement = new JsonParser().parse(reader);
-            final JsonObject info = jsonElement.getAsJsonObject();
+            // Parse the JSON response
+            final JsonObject info = new JsonParser().parse(reader).getAsJsonObject();
+
+            // And extract some data from it
             final double yield = info.get("yield").getAsDouble();
             final double calories = info.get("calories").getAsDouble();
             System.out.println("Number of servings: " + yield);
             System.out.println("Total calories: " + calories);
-            System.out.println("Full response: " + jsonElement);
+            System.out.println("Full response: " + info);
         }
 
         System.exit(0);
