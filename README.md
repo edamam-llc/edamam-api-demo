@@ -1,7 +1,8 @@
 # Demo for the *Nutrition Analysis API and Database* 
 
-This repository contains a very simple program, which uses the API to analyze
-a recipe and displays the response.
+This repository contains a very simple program, which uses Edamam's
+[Nutrition Analysis API](https://developer.edamam.com/) to analyze a recipe and
+displays the response.
 
 ## Dependencies
 The code uses the [OkHttp](http://square.github.io/okhttp/) library to perform
